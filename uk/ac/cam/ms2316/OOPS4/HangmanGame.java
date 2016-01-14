@@ -3,17 +3,12 @@ package uk.ac.cam.ms2316.OOPS4;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.io.IOException;
 
 class HangmanGame {
   
 	//Fields
-	private static String [] dictionary =   //choose secret word from these
-	{"geography", "cat", "yesterday", "java", "truck", "opportunity",
-		"fish", "token", "transportation", "bottom", "apple", "cake",
-		"remote", "pocket", "terminology", "arm", "cranberry", "tool",
-		"caterpillar", "spoon", "watermelon", "laptop", "toe", "toad",
-		"fundamental", "capitol", "garbage", "anticipate", "apple"};
-	//private String[] dictionary;
+	private ArrayList<String> dictionary;
 	private String word;
 	private int movesWrong;
 	private int movesAllowed;
@@ -23,7 +18,13 @@ class HangmanGame {
   
 	//Constructor
 	public HangmanGame() {
-		//dictionary = FileIO.getWords();
+		try {
+			System.out.println("Loading a dictionary...");
+			dictionary = WordInput.loadFromURL("https://raw.githubusercontent.com/sacummins/OOPIncompleteWordGame/master/src/main/resources/words.txt");
+		} catch (IOException e) {
+			System.out.println("Unable to load a dictionary !");
+			System.exit(0);
+		}
 		movesAllowed = 6; //depends on drawing
 	}
   
@@ -71,8 +72,8 @@ class HangmanGame {
   */
 	private void initSecretWord() {
 		Random randIndex = new Random();
-		int index = randIndex.nextInt(dictionary.length);
-		word = dictionary[index];
+		int index = randIndex.nextInt(dictionary.size());
+		word = dictionary.get(index);
 		
 		correctLetters = new ArrayList<Character>();
 		for (int i = 0; i < word.length(); i++)
