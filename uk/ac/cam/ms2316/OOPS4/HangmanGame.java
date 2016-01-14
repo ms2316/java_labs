@@ -34,32 +34,33 @@ class HangmanGame {
 	public void playGame() {
 		//initialization of the game
 		initSecretWord();
-      
-		//game
-
+		
+		//game process
 		while ( !gameOver() ) {
-			//print current Hangman
+			
 			printHangman();
 		
-			//Print correct letters guessed
 			printLetters(correctLetters);
 		
-			//Print incorrect letters  guessed
 			System.out.print("Wrong letters: ");
 			printLetters(incorrectLetters);
 			
-			//Prompt and read the next guess
 			System.out.print("Enter a letter: ");
-			String guess = scn.nextLine();
-				
-			//Process the next guess
-			handleGuess(guess.charAt(0));
+			try {
+				String guess = scn.nextLine();
+				handleGuess(guess.charAt(0));
+				System.out.println("");
+			} catch (IndexOutOfBoundsException e) {
+				System.out.println("\nNo letters entered ! ! !");
+			}
+			
 		}
 		
 		if (gameWon()) {
 			System.out.println("Congratulations, you won!");
 		} else {
 			System.out.println("Sorry, you lost.");
+			System.out.println("The secret word: " + word.toUpperCase());
 			printHangman();
 		}
 		
@@ -110,8 +111,12 @@ class HangmanGame {
 			}
 		}
 		
-		if (badMove)
+		if (badMove) {
 			movesWrong++;
+			if (!incorrectLetters.contains(letter))  
+				incorrectLetters.add(letter);
+		}
+		
 	}
 	
 	
@@ -159,5 +164,9 @@ class HangmanGame {
 		System.out.println();
 	}
 	
+	public static void main(String[] args) {
+		HangmanGame game = new HangmanGame();
+		game.playGame();
+	}
 }
 
