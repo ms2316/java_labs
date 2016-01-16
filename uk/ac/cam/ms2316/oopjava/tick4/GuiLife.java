@@ -11,12 +11,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
-//import uk.ac.cam.acr31.life.World;
+import uk.ac.cam.acr31.life.World;
 
 public class GuiLife extends JFrame {
 
    private PatternPanel patternPanel;
    private ControlPanel controlPanel;
+   private GamePanel gamePanel;
 	
    public GuiLife() {
       super("GuiLife");
@@ -46,8 +47,8 @@ public class GuiLife extends JFrame {
    private JComponent createGamePanel() {
       JPanel holder = new JPanel();
       addBorder(holder,Strings.PANEL_GAMEVIEW);
-      JPanel result = new JPanel();
-      holder.add(result);
+      gamePanel = new GamePanel();
+      holder.add(gamePanel);
       return new JScrollPane(holder);
    }
 
@@ -77,9 +78,13 @@ public class GuiLife extends JFrame {
 		String url="http://www.cl.cam.ac.uk/teaching/current/OOProg/life.txt";
 		List<Pattern> list = PatternLoader.loadFromURL(url);
 		gui.patternPanel.setPatterns(list);
+		World w = gui.controlPanel.initialiseWorld(list.get(1));
+		gui.gamePanel.display(w);
 	  } catch (IOException ioe) {
 		//TODO: don't leave empty exception handlers!
 		System.out.println("Unable to load Patterns for www.cl.cam.ac.uk/...");
+	  } catch (PatternFormatException e) {
+		System.out.println("Invalid pattern format");
 	  }
       gui.setVisible(true);
    }
