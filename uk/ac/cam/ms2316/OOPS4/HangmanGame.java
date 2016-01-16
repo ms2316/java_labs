@@ -35,6 +35,7 @@ class HangmanGame {
 	public void playGame() {
 		//initialization of the game
 		initSecretWord();
+		movesWrong = 0;
 		
 		//game process
 		while ( !gameOver() ) {
@@ -59,6 +60,7 @@ class HangmanGame {
 		
 		if (gameWon()) {
 			System.out.println("Congratulations, you won!");
+			System.out.println("The secret word: " + word.toUpperCase());
 		} else {
 			System.out.println("Sorry, you lost.");
 			System.out.println("The secret word: " + word.toUpperCase());
@@ -165,9 +167,5 @@ class HangmanGame {
 		System.out.println();
 	}
 	
-	public static void main(String[] args) {
-		HangmanGame game = new HangmanGame();
-		game.playGame();
-	}
 }
 
