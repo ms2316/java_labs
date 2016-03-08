@@ -12,7 +12,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
 import javax.swing.Timer;
+import javax.swing.JOptionPane;
 import java.awt.event.*;
+import javax.swing.JFileChooser;
+import java.io.File;
+import java.io.FileReader;
 import uk.ac.cam.acr31.life.World;
 
 public class GuiLife extends JFrame {
@@ -60,13 +64,60 @@ public class GuiLife extends JFrame {
    }
 
    private JComponent createSourcePanel() {
-      SourcePanel result = new SourcePanel();
+      JPanel result = new SourcePanel(){
+      
+			protected boolean setSourceFile() {
+				JFileChooser chooser = new JFileChooser();
+				int returnVal = chooser.showOpenDialog(this);
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					File f = chooser.getSelectedFile();
+					try {
+						List<Pattern> list = PatternLoader.load(new FileReader(f));
+						patternPanel.setPatterns(list);
+						resetWorld();
+						return true;
+					} catch (IOException ioe) {}
+				}
+				return false;
+			}
+			
+			protected boolean setSourceNone() {
+				world = null;
+				patternPanel.setPatterns(null);
+				resetWorld();
+				return true;
+			}
+			
+			protected boolean setSourceLibrary() {
+				String u = "http://www.cl.cam.ac.uk/teaching/current/OOProg/nextlife.txt";
+				return setSourceWeb(u);
+			}
+			
+			private boolean setSourceWeb(String url) {
+				try {
+					List<Pattern> list = PatternLoader.loadFromURL(url);
+					patternPanel.setPatterns(list);
+					resetWorld();
+					return true;
+				} catch (IOException ioe) {}
+				return false;
+			}
+			
+	  };
+	  
       addBorder(result,Strings.PANEL_SOURCE);
       return result; 
+      
+      
+      
    }
 
    private JComponent createPatternPanel() {
-	  PatternPanel result = new PatternPanel();
+	  PatternPanel result = new PatternPanel(){
+		protected void onPatternChange() {
+			resetWorld();
+		}
+	  };
 	  addBorder(result,Strings.PANEL_PATTERN);
 	  patternPanel = result; // REFERENCES 14 TASK
 	  return result; 
@@ -100,7 +151,25 @@ public class GuiLife extends JFrame {
          gamePanel.display(world);
       }
    }
+   
+   private void resetWorld() {
+		Pattern current = patternPanel.getCurrentPattern();
+		world = null;
+		if (current != null) {
+			try {
+				world = controlPanel.initialiseWorld(current);
+			} catch (PatternFormatException e) {
+				JOptionPane.showMessageDialog(this,
+					"Error initialising world",
+					"An error occurred when initialising the world. "+e.getMessage(),
+					JOptionPane.ERROR_MESSAGE);
+			}
+		}
+		gamePanel.display(world);
+		repaint();
+	}
 
+	/*
    public static void main(String[] args) {
       GuiLife gui = new GuiLife();
       try {
@@ -118,4 +187,14 @@ public class GuiLife extends JFrame {
 	  gui.playTimer.start();
       gui.setVisible(true);
    }
+   */
+   
+   
+   public static void main(String[] args) {
+		GuiLife gui = new GuiLife();
+		gui.playTimer.start();
+		gui.resetWorld();
+		gui.setVisible(true);
+	}
+	
 }
